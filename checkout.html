@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Bazaar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center gap-4">
+            <a href="index.html" class="text-2xl font-bold text-orange-500"><i class="fas fa-shopping-bag"></i> Bazaar</a>
+            <span class="ml-auto text-sm text-gray-600">Secure Checkout</span>
+        </div>
+    </header>
+
+    <main class="max-w-2xl mx-auto px-4 py-8">
+        <div class="grid md:grid-cols-3 gap-8">
+            <!-- Checkout Form -->
+            <div class="md:col-span-2 bg-white rounded-lg shadow p-6">
+                <h2 class="text-2xl font-bold mb-6">Checkout</h2>
+                
+                <!-- Shipping Address -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-4">Shipping Address</h3>
+                    <form id="addressForm" class="space-y-3">
+                        <input type="text" placeholder="Full Name" required class="w-full border rounded px-3 py-2">
+                        <input type="email" placeholder="Email" required class="w-full border rounded px-3 py-2">
+                        <input type="tel" placeholder="Phone" required class="w-full border rounded px-3 py-2">
+                        <input type="text" placeholder="Street Address" required class="w-full border rounded px-3 py-2">
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="text" placeholder="City" required class="border rounded px-3 py-2">
+                            <input type="text" placeholder="Postal Code" required class="border rounded px-3 py-2">
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-4">Payment Method</h3>
+                    <div id="card-element" class="border rounded p-3 bg-gray-50"></div>
+                    <div id="card-errors" class="text-red-600 mt-2" role="alert"></div>
+                </div>
+
+                <!-- Place Order Button -->
+                <button id="payBtn" class="w-full bg-orange-500 text-white font-bold py-3 rounded hover:bg-orange-600 transition flex items-center justify-center gap-2">
+                    <span id="payBtnText">Pay Now</span>
+                    <i id="payBtnIcon" class="fas fa-lock"></i>
+                </button>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="bg-white rounded-lg shadow p-6 h-fit">
+                <h3 class="text-lg font-semibold mb-4">Order Summary</h3>
+                <div id="cartSummary" class="space-y-2 mb-4 pb-4 border-b">
+                    <!-- Populated via JavaScript -->
+                </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <span>Subtotal</span>
+                        <span id="subtotal">Rs. 0</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span>Shipping</span>
+                        <span id="shipping">Rs. 200</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span>Tax</span>
+                        <span id="tax">Rs. 0</span>
+                    </div>
+                    <div class="flex justify-between font-bold text-lg border-t pt-2">
+                        <span>Total</span>
+                        <span id="total" class="text-orange-500">Rs. 0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const stripe = Stripe('pk_test_YOUR_STRIPE_KEY');
+        const elements = stripe.elements();
+        const cardElement = elements.create('card');
+        cardElement.mount('#card-element');
+
+        // Load cart and calculate total
+        function loadCheckout() {
+            const cart = JSON.parse(localStorage.getItem('bazaarCart') || '[]');
+            let subtotal = 0;
+            
+            const summary = document.getElementById('cartSummary');
+            summary.innerHTML = cart.map(item => {
+                subtotal += item.price;
+                return `
+                    <div class="flex justify-between text-sm">
+                        <span>${item.title}</span>
+                        <span>Rs. ${item.price}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            const shipping = 200;
+            const tax = Math.round(subtotal * 0.05);
+            const total = subtotal + shipping + tax;
+            
+            document.getElementById('subtotal').innerText = `Rs. ${subtotal}`;
+            document.getElementById('tax').innerText = `Rs. ${tax}`;
+            document.getElementById('total').innerText = `Rs. ${total}`;
+        }
+
+        // Handle payment
+        document.getElementById('payBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            
+            const payBtn = document.getElementById('payBtn');
+            payBtn.disabled = true;
+            payBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            
+            try {
+                // Create payment intent
+                const response = await fetch('/api/payment/create-intent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: parseInt(document.getElementById('total').innerText.replace('Rs. ', '')),
+                        orderId: 'ORDER_' + Date.now(),
+                    }),
+                });
+                
+                const { clientSecret } = await response.json();
+                
+                // Confirm payment
+                const result = await stripe.confirmCardPayment(clientSecret, {
+                    payment_method: {
+                        card: cardElement,
+                        billing_details: { name: 'Customer' },
+                    },
+                });
+                
+                if (result.paymentIntent.status === 'succeeded') {
+                    localStorage.removeItem('bazaarCart');
+                    alert('Payment successful! Order placed.');
+                    window.location.href = 'index.html';
+                } else {
+                    alert('Payment failed. Please try again.');
+                    payBtn.disabled = false;
+                    payBtn.innerText = 'Pay Now';
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+                payBtn.disabled = false;
+                payBtn.innerText = 'Pay Now';
+            }
+        });
+        
+        loadCheckout();
+    </script>
+</body>
+</html>
