@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Clock - Multiple Time Zones</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1><i class="fas fa-clock"></i> Global Time Zone Clock</h1>
+            <p>Real-time display across multiple time zones</p>
+        </header>
+
+        <!-- Controls -->
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search time zone..." class="search-input">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            <div class="format-toggle">
+                <button id="format12" class="format-btn active">12 Hour</button>
+                <button id="format24" class="format-btn">24 Hour</button>
+            </div>
+        </div>
+
+        <!-- Add Custom Time Zone -->
+        <div class="add-timezone">
+            <select id="timezoneSelect" class="timezone-select">
+                <option value="">+ Add Time Zone</option>
+            </select>
+        </div>
+
+        <!-- Clock Grid -->
+        <div class="clocks-grid" id="clocksGrid">
+            <!-- Clocks will be inserted here -->
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Made with <i class="fas fa-heart"></i> by Ladla Choudhary</p>
+            <p>Last updated: <span id="lastUpdate">--:--:--</span></p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
