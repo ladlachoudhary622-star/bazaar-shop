@@ -3,49 +3,266 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Clock - Multiple Time Zones</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Bazaar - Online Shopping Platform</title>
+    <!-- Tailwind CSS CDN for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darazOrange: '#f57224',
+                        darazDark: '#2e2e2e',
+                        darazBg: '#f5f5f5'
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
-    <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <h1><i class="fas fa-clock"></i> Global Time Zone Clock</h1>
-            <p>Real-time display across multiple time zones</p>
-        </header>
+<body class="bg-darazBg font-sans text-gray-800">
 
-        <!-- Controls -->
-        <div class="controls">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search time zone..." class="search-input">
-                <i class="fas fa-search search-icon"></i>
+    <!-- Top Announcement Bar -->
+    <div class="bg-gray-100 text-xs text-gray-600 py-1 px-4 border-b">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="space-x-4">
+                <a href="#" class="hover:text-darazOrange">Become a Seller</a>
+                <a href="#" class="hover:text-darazOrange">Help & Support</a>
             </div>
-            <div class="format-toggle">
-                <button id="format12" class="format-btn active">12 Hour</button>
-                <button id="format24" class="format-btn">24 Hour</button>
+            <div class="space-x-4">
+                <a href="#" class="hover:text-darazOrange"><i class="fas fa-user-shield mr-1"></i> Buyer Protection</a>
+                <a href="#" class="hover:text-darazOrange"><i class="fas fa-mobile-alt mr-1"></i> Save More on App</a>
             </div>
         </div>
-
-        <!-- Add Custom Time Zone -->
-        <div class="add-timezone">
-            <select id="timezoneSelect" class="timezone-select">
-                <option value="">+ Add Time Zone</option>
-            </select>
-        </div>
-
-        <!-- Clock Grid -->
-        <div class="clocks-grid" id="clocksGrid">
-            <!-- Clocks will be inserted here -->
-        </div>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <p>Made with <i class="fas fa-heart"></i> by Ladla Choudhary</p>
-            <p>Last updated: <span id="lastUpdate">--:--:--</span></p>
-        </footer>
     </div>
 
-    <script src="app.js"></script>
+    <!-- Main Header -->
+    <header class="bg-white sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+            <!-- Brand Logo -->
+            <a href="#" class="text-3xl font-extrabold text-darazOrange tracking-tight flex items-center gap-1">
+                <i class="fas fa-shopping-bag"></i> Bazaar
+            </a>
+
+            <!-- Search Bar -->
+            <div class="flex-1 max-w-2xl relative">
+                <div class="flex">
+                    <input type="text" id="searchInput" placeholder="Search in Bazaar..." 
+                        class="w-full bg-gray-100 border border-gray-300 rounded-l-md px-4 py-2 text-sm focus:outline-none focus:border-darazOrange">
+                    <button class="bg-darazOrange text-white px-6 py-2 rounded-r-md hover:bg-orange-600 transition">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- User Actions -->
+            <div class="flex items-center gap-6">
+                <button class="flex items-center gap-2 text-gray-700 hover:text-darazOrange">
+                    <i class="far fa-user text-xl"></i>
+                    <span class="text-sm font-medium hidden sm:inline">Login / Sign Up</span>
+                </button>
+                
+                <!-- Cart Button -->
+                <button onclick="toggleCart()" class="relative flex items-center text-gray-700 hover:text-darazOrange">
+                    <i class="fas fa-shopping-cart text-2xl"></i>
+                    <span id="cartCount" class="absolute -top-2 -right-2 bg-darazOrange text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 py-4 space-y-6">
+
+        <!-- Hero Section: Categories + Slider Banner -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <!-- Category Sidebar -->
+            <div class="bg-white rounded-md shadow-sm p-3 hidden md:block">
+                <h3 class="text-xs font-bold text-gray-400 uppercase mb-2 px-2">Categories</h3>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#" class="block px-2 py-1 hover:bg-orange-50 hover:text-darazOrange rounded"><i class="fas fa-mobile-alt w-6"></i> Electronics</a></li>
+                    <li><a href="#" class="block px-2 py-1 hover:bg-orange-50 hover:text-darazOrange rounded"><i class="fas fa-tshirt w-6"></i> Fashion & Apparel</a></li>
+                    <li><a href="#" class="block px-2 py-1 hover:bg-orange-50 hover:text-darazOrange rounded"><i class="fas fa-home w-6"></i> Home & Lifestyle</a></li>
+                    <li><a href="#" class="block px-2 py-1 hover:bg-orange-50 hover:text-darazOrange rounded"><i class="fas fa-heartbeat w-6"></i> Health & Beauty</a></li>
+                    <li><a href="#" class="block px-2 py-1 hover:bg-orange-50 hover:text-darazOrange rounded"><i class="fas fa-football-ball w-6"></i> Sports & Outdoor</a></li>
+                    <li><a href="#" class="block px-2 py-1 hover:bg-orange-50 hover:text-darazOrange rounded"><i class="fas fa-plug w-6"></i> Appliances</a></li>
+                </ul>
+            </div>
+
+            <!-- Hero Banner -->
+            <div class="md:col-span-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-md p-8 text-white flex flex-col justify-center min-h-[300px] shadow-sm relative overflow-hidden">
+                <div class="z-10 max-w-md">
+                    <span class="bg-yellow-400 text-gray-900 text-xs font-extrabold px-2 py-1 rounded uppercase">Mega Sale 11.11</span>
+                    <h1 class="text-4xl font-extrabold mt-2 mb-4 leading-tight">Up to 70% Off On Electronics & Accessories</h1>
+                    <button class="bg-white text-darazOrange font-bold px-6 py-2.5 rounded-md shadow hover:bg-gray-100 transition">Shop Now</button>
+                </div>
+                <i class="fas fa-shopping-cart text-white opacity-10 text-[200px] absolute -right-10 -bottom-10"></i>
+            </div>
+        </div>
+
+        <!-- Flash Sale Section -->
+        <section class="bg-white rounded-md shadow-sm p-4">
+            <div class="flex items-center justify-between border-b pb-3 mb-4">
+                <div class="flex items-center gap-4">
+                    <h2 class="text-lg font-bold text-darazOrange flex items-center gap-2">
+                        <i class="fas fa-bolt"></i> Flash Sale
+                    </h2>
+                    <div class="flex items-center gap-1 text-xs font-bold text-white">
+                        <span class="text-gray-600 mr-1">On Sale Now</span>
+                        <span class="bg-darazOrange px-2 py-1 rounded" id="hours">05</span> :
+                        <span class="bg-darazOrange px-2 py-1 rounded" id="minutes">24</span> :
+                        <span class="bg-darazOrange px-2 py-1 rounded" id="seconds">18</span>
+                    </div>
+                </div>
+                <a href="#" class="text-sm font-semibold text-darazOrange border border-darazOrange px-3 py-1 rounded hover:bg-orange-50">SHOP MORE</a>
+            </div>
+
+            <!-- Flash Sale Items -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3" id="flashSaleGrid">
+                <!-- Injected via JavaScript -->
+            </div>
+        </section>
+
+        <!-- Just For You / Products Grid -->
+        <section class="space-y-3">
+            <h2 class="text-lg font-bold text-gray-800">Just For You</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3" id="productGrid">
+                <!-- Injected via JavaScript -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Slide-out Shopping Cart Drawer -->
+    <div id="cartDrawer" class="fixed inset-y-0 right-0 w-80 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50 p-4 flex flex-col">
+        <div class="flex justify-between items-center border-b pb-3">
+            <h3 class="font-bold text-lg"><i class="fas fa-shopping-bag text-darazOrange"></i> My Cart</h3>
+            <button onclick="toggleCart()" class="text-gray-500 hover:text-black"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        
+        <div id="cartItemsList" class="flex-1 overflow-y-auto py-4 space-y-3 text-sm">
+            <p class="text-gray-400 text-center py-8">Your cart is empty.</p>
+        </div>
+
+        <div class="border-t pt-3 space-y-2">
+            <div class="flex justify-between font-bold text-base">
+                <span>Total:</span>
+                <span id="cartTotal" class="text-darazOrange">Rs. 0</span>
+            </div>
+            <button onclick="alert('Proceeding to Checkout!')" class="w-full bg-darazOrange text-white font-bold py-2.5 rounded-md hover:bg-orange-600 transition">
+                Proceed to Checkout
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript logic -->
+    <script>
+        // Sample Product Data
+        const products = [
+            { id: 1, title: 'Wireless Bluetooth Earbuds TWS', price: 1499, oldPrice: 2999, discount: '-50%', img: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=300' },
+            { id: 2, title: 'Smart Watch Fitness Tracker', price: 2850, oldPrice: 4500, discount: '-36%', img: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300' },
+            { id: 3, title: 'Gaming Headset 7.1 Surround', price: 3200, oldPrice: 6000, discount: '-46%', img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300' },
+            { id: 4, title: 'Stainless Steel Water Bottle 1L', price: 890, oldPrice: 1500, discount: '-40%', img: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=300' },
+            { id: 5, title: 'RGB Mechanical Keyboard', price: 4100, oldPrice: 7500, discount: '-45%', img: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=300' },
+            { id: 6, title: 'Ergonomic Wireless Mouse', price: 1150, oldPrice: 2000, discount: '-42%', img: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=300' },
+        ];
+
+        let cart = [];
+
+        // Render Products
+        function renderProducts() {
+            const flashContainer = document.getElementById('flashSaleGrid');
+            const mainContainer = document.getElementById('productGrid');
+
+            let html = '';
+            products.forEach(p => {
+                html += `
+                    <div class="bg-white rounded border hover:shadow-md transition p-2 flex flex-col justify-between">
+                        <div class="relative mb-2">
+                            <img src="${p.img}" alt="${p.title}" class="w-full h-32 object-cover rounded">
+                            <span class="absolute top-1 left-1 bg-darazOrange text-white text-[100px] text-xs font-bold px-1.5 py-0.5 rounded">${p.discount}</span>
+                        </div>
+                        <h4 class="text-xs font-medium line-clamp-2 mb-1 text-gray-700">${p.title}</h4>
+                        <div class="text-darazOrange font-bold text-sm">Rs. ${p.price}</div>
+                        <div class="text-xs text-gray-400 line-through">Rs. ${p.oldPrice}</div>
+                        <button onclick="addToCart(${p.id})" class="mt-2 w-full bg-orange-50 text-darazOrange border border-darazOrange text-xs font-semibold py-1 rounded hover:bg-darazOrange hover:text-white transition">
+                            Add To Cart
+                        </button>
+                    </div>
+                `;
+            });
+
+            flashContainer.innerHTML = html;
+            mainContainer.innerHTML = html + html; // Duplicate for more content
+        }
+
+        // Cart Drawer Toggle
+        function toggleCart() {
+            const drawer = document.getElementById('cartDrawer');
+            drawer.classList.toggle('translate-x-full');
+        }
+
+        // Add to Cart Functionality
+        function addToCart(productId) {
+            const item = products.find(p => p.id === productId);
+            cart.push(item);
+            updateCartUI();
+        }
+
+        // Update Cart Drawer UI
+        function updateCartUI() {
+            document.getElementById('cartCount').innerText = cart.length;
+            const cartList = document.getElementById('cartItemsList');
+            const totalEl = document.getElementById('cartTotal');
+
+            if (cart.length === 0) {
+                cartList.innerHTML = `<p class="text-gray-400 text-center py-8">Your cart is empty.</p>`;
+                totalEl.innerText = `Rs. 0`;
+                return;
+            }
+
+            let total = 0;
+            cartList.innerHTML = cart.map((item, index) => {
+                total += item.price;
+                return `
+                    <div class="flex items-center justify-between border-b pb-2">
+                        <div class="flex items-center gap-2">
+                            <img src="${item.img}" class="w-10 h-10 object-cover rounded">
+                            <div>
+                                <p class="font-medium text-xs line-clamp-1">${item.title}</p>
+                                <p class="text-xs text-darazOrange font-bold">Rs. ${item.price}</p>
+                            </div>
+                        </div>
+                        <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 text-xs">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            totalEl.innerText = `Rs. ${total}`;
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        // Countdown Timer Logic
+        setInterval(() => {
+            const secEl = document.getElementById('seconds');
+            let sec = parseInt(secEl.innerText);
+            if (sec > 0) {
+                secEl.innerText = (sec - 1).toString().padStart(2, '0');
+            } else {
+                secEl.innerText = '59';
+            }
+        }, 1000);
+
+        // Initialize page
+        renderProducts();
+    </script>
 </body>
 </html>
